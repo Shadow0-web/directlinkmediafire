@@ -108,7 +108,53 @@
         <button onclick="bypassLink()">Generar</button>
         <div class="result" id="result"></div>
     </div>
+<script>
+         document.getElementById('boton-retroceso')?.addEventListener('click', function() {
+        window.history.back();
+    });
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I")) {
+            e.preventDefault();
+        }
+    });
+    
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+    });
+    
+    document.addEventListener('keydown', function(event) {
+        if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+            event.preventDefault();
+            alert('Guardar esta página está deshabilitado.');
+        }
+    });
 
+    document.addEventListener('keydown', function(event) {
+
+    if (event.key === "F12") {
+        event.preventDefault();
+        alert('La tecla F12 está deshabilitada.');
+    }
+
+    if (event.ctrlKey && event.shiftKey && event.key === "I") {
+        event.preventDefault();
+        alert('Ctrl+Shift+I está deshabilitado.');
+    }
+
+    if (event.ctrlKey && event.shiftKey && event.key === "J") {
+        event.preventDefault();
+        alert('Ctrl+Shift+J está deshabilitado.');
+    }
+
+    if (event.ctrlKey && event.key === "u") {
+        event.preventDefault();
+        alert('Ctrl+U está deshabilitado.');
+    }
+});   
+
+
+</script>
     <script>
         const canvas = document.getElementById('starCanvas');
         const ctx = canvas.getContext('2d');
