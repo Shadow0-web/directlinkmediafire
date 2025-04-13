@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direct link mediafire</title>
+    <style>
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+            font-family: Arial, sans-serif;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background-color: #2c2c2c;
+            color: #ffffff;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #000000;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0f0f0f;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            color: antiquewhite;
+            background-color: #000000;
+            border: 1px solid #444;
+            border-radius: 4px;
+            word-wrap: break-word;
+            font-size: 14px;
+        }
+
+        #starCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 20px;
+            }
+
+            input[type="text"] {
+                font-size: 14px;
+            }
+
+            button {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+
+            .result {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="starCanvas"></canvas>
+    
+    <div class="container">
+        <h1>Enlaces directos Mediafire</h1>
+        <input type="text" id="urlInput" placeholder="Ingresa el enlace aquí">
+        <button onclick="bypassLink()">Generar</button>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('starCanvas');
+        const ctx = canvas.getContext('2d');
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        class Star {
+            constructor(atBottom = false) {
+                this.radius = Math.random() * 1.5 + 0.5;
+                this.x = Math.random() * canvas.width;
+                this.y = atBottom ? canvas.height + this.radius : Math.random() * canvas.height;
+                const hue = Math.random() * 60 + 180; 
+                const saturation = Math.random() * 20; 
+                const lightness = 90 + Math.random() * 10;          
+                this.color = `hsla(${hue}, ${saturation}%, ${lightness}%, 1)`;
+                this.velocity = (Math.random() * 0.5 + 0.1) * (this.radius / 1.5);
+                this.opacity = Math.random() * 0.5 + 0.5;
+                this.twinkleSpeed = Math.random() * 0.01 + 0.005;
+                this.twinklePhase = Math.random() * Math.PI * 2;
+            }
+
+            update() {
+                this.y -= this.velocity;  
+                this.twinklePhase += this.twinkleSpeed;
+                return this.y < -this.radius * 5;
+            }
+
+            draw() {
+
+                const twinkle = Math.sin(this.twinklePhase) * 0.3 + 0.7;
+                
+                ctx.save();
+            
+                const gradient = ctx.createRadialGradient(
+                    this.x, this.y, 0,
+                    this.x, this.y, this.radius * 4
+                );
+                gradient.addColorStop(0, this.color);
+                gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                
+                ctx.fillStyle = gradient;
+                ctx.globalAlpha = this.opacity * twinkle * 0.5;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius * 4, 0, Math.PI * 2);
+                ctx.fill();
+        
+                ctx.beginPath();
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.opacity * twinkle;
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+           
+                if (this.radius > 1) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = this.color;
+                    ctx.globalAlpha = this.opacity * twinkle * 0.5;
+                    ctx.lineWidth = this.radius / 4;
+                    
+       
+                    ctx.moveTo(this.x - this.radius * 2, this.y);
+                    ctx.lineTo(this.x + this.radius * 2, this.y);
+                    
+  
+                    ctx.moveTo(this.x, this.y - this.radius * 2);
+                    ctx.lineTo(this.x, this.y + this.radius * 2);
+                    
+                    ctx.stroke();
+                }
+                
+                ctx.restore();
+            }
+        }
+        const stars = [];
+        const starCount = Math.floor(canvas.width * canvas.height / 3000); 
+
+        for (let i = 0; i < starCount; i++) {
+            stars.push(new Star());
+        }
+
+     
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+          
+            for (let i = 0; i < stars.length; i++) {
+   
+                if (stars[i].update()) {
+                    stars[i] = new Star(true);
+                }
+                
+                stars[i].draw();
+            }
+            
+      
+            if (Math.random() < 0.05) {
+                stars.push(new Star(true));
+                
+                if (stars.length > starCount * 1.2) {
+                    stars.shift();
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        }
+        
+        animate();
+
+        async function bypassLink() {
+            const url = document.getElementById('urlInput').value;
+            const apiUrl = `https://api.solar-x.top/api/v3/bypass?url=${encodeURIComponent(url)}`;
+            const resultDiv = document.getElementById('result');
+
+            resultDiv.textContent = 'Procesando...';
+
+            try {
+                const response = await fetch(apiUrl);
+
+                if (!response.ok) {
+                    throw new Error(`Error en la solicitud: ${response.status} ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                if (data.result) {
+                    resultDiv.innerHTML = `<strong>Enlace directo:</strong> <a href="${data.result}" target="_blank" style="color: #4dabf7;">${data.result}</a>`;
+                } else {
+                    resultDiv.textContent = 'Error: No se encontró un enlace bypassed en la respuesta.';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.textContent = `Error: ${error.message || 'No se pudo conectar con la API.'}`;
+            }
+        }
+    </script>
+        <script>
+
+            async function bypassLink() {
+              const url = document.getElementById('urlInput').value;
+              const apiUrl = `https://api.solar-x.top/api/v3/bypass?url=${encodeURIComponent(url)}`;
+              const resultDiv = document.getElementById('result');
+          
+              resultDiv.textContent = 'Procesando...';
+          
+              try {
+                const response = await fetch(apiUrl);
+          
+                if (!response.ok) {
+                  throw new Error(`Error en la solicitud: ${response.status} ${response.statusText}`);
+                }
+          
+                const data = await response.json();
+          
+                if (data.result) {
+                  resultDiv.innerHTML = `
+                    <strong>Enlace directo:</strong> 
+                    <a href="${data.result}" target="_blank" style="color: #4dabf7; display: block; margin: 5px 0;">${data.result}</a>
+                    <button onclick="copyToClipboard('${data.result}')" style="padding: 5px 10px; background-color: #2c2c2c; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                      Copiar enlace
+                    </button>
+                  `;
+                } else {
+                  resultDiv.textContent = 'Error: No se encontró un enlace bypassed en la respuesta.';
+                }
+              } catch (error) {
+                console.error('Error:', error);
+                resultDiv.textContent = `Error: ${error.message || 'No se pudo conectar con la API.'}`;
+              }
+            }
+          
+            function copyToClipboard(text) {
+              navigator.clipboard.writeText(text)
+                .then(() => {
+                  alert('Enlace copiado al portapapeles!');
+                })
+                .catch(err => {
+                  console.error('Error al copiar: ', err);
+                });
+            }
+          </script>
+
+</body>
+</html>
+
